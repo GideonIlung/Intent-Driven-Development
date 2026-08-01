@@ -16,7 +16,7 @@
 - `adr/` — durable. Decision log. Immutable; superseded, never edited.
 - `work/` — transient. Where documents are authored. Safe to prune.
 - `templates/` — artifact skeletons.
-- `.opencode/` — the commands and skills.
+- `.agents/` — the commands and skills. Symlinked into `.claude/` and `.opencode/`.
 - `AGENTS.md` — per-project rules + the verification gate. **Fill this first.**
 - `ralph.sh`, `ralph_prompt.md` — the build loop.
 - `finalise.sh` — commit + tag a finished document.

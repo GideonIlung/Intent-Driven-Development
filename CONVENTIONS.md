@@ -25,5 +25,5 @@ Finish a document with:  `bash finalise.sh <lead-doc>`
 List anchors:  `git tag -l 'impl/*'`  /  `git tag -l 'inv/*'`
 
 ## Skills
-`.opencode/skills/`: grill-me, c4-diagrams, gherkin-authoring,
+`.agents/skills/`: grill-me, c4-diagrams, gherkin-authoring,
 architectural-decision-records, glossary.
