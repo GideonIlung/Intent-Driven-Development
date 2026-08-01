@@ -1,6 +1,9 @@
 ---
 description: Check that a change's C4 diagram and its Gherkin scenarios agree. Walks each Given/When/Then across the diagram's components and reports holes. Read-only, change-scoped, prints to chat — writes nothing.
+argument-hint: [slug]
 ---
+
+**Argument**: `$ARGUMENTS`
 
 Coherence lint for one change: cross-reference its C4 diagram (structure) against its
 Gherkin scenarios (behaviour) and report where they disagree. Executes nothing —

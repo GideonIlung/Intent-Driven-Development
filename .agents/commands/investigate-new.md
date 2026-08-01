@@ -1,6 +1,9 @@
 ---
 description: Start a read-only investigation — grill to scope the symptom, scaffold the investigation folder, trace to a proven root cause, and write the report. Never edits code or specs.
+argument-hint: [slug|description]
 ---
+
+**Argument**: `$ARGUMENTS`
 
 Start an investigation: read-only root-cause analysis that ends in a report. It reads the
 code and durable `specs/` to ground itself and NEVER edits anything — not code, not

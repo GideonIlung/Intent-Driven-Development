@@ -1,6 +1,9 @@
 ---
 description: Resume an implementation change — advance to the next artifact, or revise an existing one (warn-and-stop). Grill-me runs in both branches.
+argument-hint: [slug] [artifact]
 ---
+
+**Argument**: `$ARGUMENTS`
 
 Resume an implementation change. Two branches, chosen automatically:
 - ADVANCE (default): draft the next artifact in dependency order.

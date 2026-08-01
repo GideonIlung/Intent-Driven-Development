@@ -1,6 +1,9 @@
 ---
 description: One-time ground-zero for an EXISTING codebase — read the real code and seed durable specs/<capability> and adr/ to reflect current reality. Incremental, one capability per run. The deliberate exception that writes the durable layer directly (not a change).
+argument-hint: [capability]
 ---
+
+**Argument**: `$ARGUMENTS`
 
 Establish the baseline for a brownfield repo: document what the code ALREADY does into
 the durable layer. This is the ONE deliberate exception to "durable only changes via

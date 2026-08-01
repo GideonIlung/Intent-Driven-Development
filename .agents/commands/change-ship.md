@@ -1,6 +1,9 @@
 ---
 description: Prepare an implementation change for Ralph. Runs the trace-check gate, builds a human-readable prd.md for your review, then on your OK converts it to prd.json. Does not run Ralph.
+argument-hint: <slug>
 ---
+
+**Argument**: `$ARGUMENTS`
 
 Prepare a change to hand to the Ralph loop. Order: coherence gate → prd.md (your review) →
 prd.json. Stops before Ralph — you run `./ralph.sh` yourself, then `/change-finish`.

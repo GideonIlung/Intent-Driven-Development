@@ -1,6 +1,9 @@
 ---
 description: Resume a read-only investigation — re-grill on what's unresolved or wrong and refine the report. Single document, no dependency chain, no staleness warnings. Never edits code or specs.
+argument-hint: [slug]
 ---
+
+**Argument**: `$ARGUMENTS`
 
 Resume an investigation to dig deeper or fix the report. Unlike a change, an investigation
 is ONE document with no dependency chain — so this just re-grills and rewrites the report.

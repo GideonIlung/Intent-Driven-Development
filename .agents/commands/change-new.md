@@ -1,6 +1,9 @@
 ---
 description: Start a new implementation change — grill against the proposal, confirm structure, scaffold the change folder. Does not draft the rest of the chain.
+argument-hint: <slug|description>
 ---
+
+**Argument**: `$ARGUMENTS`
 
 Start a new implementation change. This ONLY produces the proposal and scaffolds the
 folder — it deliberately stops before the rest of the chain. Run `/change-continue`

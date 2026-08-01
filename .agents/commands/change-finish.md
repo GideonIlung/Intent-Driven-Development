@@ -1,6 +1,9 @@
 ---
 description: Close out an implementation change AFTER Ralph has passed. Verifies every story passed, reconciles the delta-spec to what was actually built, archives it into durable specs/ (+ ADRs, README), then commits and tags via finalise.sh. Refuses if the build is incomplete.
+argument-hint: <slug>
 ---
+
+**Argument**: `$ARGUMENTS`
 
 Run this ONCE `ralph.sh` has finished with every story passing. It is the post-build
 lifecycle: verify → reconcile → archive → finalise. It does NOT run Ralph (you do that)
