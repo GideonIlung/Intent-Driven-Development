@@ -1,67 +1,72 @@
 ---
 name: c4-diagrams
-description: Use when explaining existing code architecture, visualizing a new system before detailed design, mapping software boundaries, or creating C4-style diagrams in ASCII or Mermaid.
+description: Use when explaining existing code architecture, visualizing a system before detailed design, mapping software boundaries, or producing a diagram artifact. Emits ONE diagram document with fixed headings that trace-check reads.
 ---
 
 # C4 Diagrams
 
 ## Overview
+Produce ONE diagram document that shows a system as a flat, machine-readable graph AND a
+layered, human-readable view of the same graph. The section headings are a FIXED CONTRACT
+that other tools (trace-check) depend on — they are NEVER renamed per project or per run.
 
-Use C4 diagrams to clarify software architecture before detailed design. Focus on boundaries, responsibilities, actors, dependencies, and data flow; draw only the levels that add value.
+## Output contract — use these EXACT headings, every run
+Emit a single document following `templates/diagram.md`, with these literal headings, in order:
 
-## First Gates
+- `## System diagram` — REQUIRED, machine-facing.
+  - ONE flat Mermaid graph: every component and every edge in a single graph.
+  - Not split across diagrams; not replaced by a context / container / sequence view.
+  - trace-check walks Gherkin scenarios across THIS graph — it must be complete and flat.
+- `## Overview` — human-facing.
+  - One small Mermaid graph of the same system, <= 7-9 boxes (group and push detail down if larger).
+  - 2-3 plain-language bullets: what it does.
+- `## <Box name>` — one per Overview box, human-facing.
+  - Heading = the box's exact name from the Overview.
+  - Bullets: Does / Takes in / Sends out, plus a small Mermaid graph of the box's internals.
+- `## Flow: <name>` — OPTIONAL, human-facing.
+  - A `sequenceDiagram` for one runtime flow, if it adds value.
+  - trace-check IGNORES this section; it is never a substitute for `## System diagram`.
 
-Before diagramming, determine these choices. If the user already specified one, honor it. If multiple choices are ambiguous, ask one concise combined question.
+DO NOT emit headings like "System Context", "Container View", "Data Flow", or one section
+per C4 level. Those names break the contract. Fold C4 thinking INTO the fixed sections:
+Overview ~= context/container level; detail sections ~= component level; System diagram =
+the flat union of them; Flow = the dynamic view.
 
-| Choice | Options | Default behavior |
-| --- | --- | --- |
-| Purpose | Existing code, new system, design review | Existing code requires codebase exploration first; new systems require assumptions called out. |
-| Format | ASCII, Mermaid | Ask the user. Mermaid means plain Mermaid syntax, not C4-specific Mermaid. |
-| Rigor | Strict C4, lightweight C4-inspired, hybrid | Ask the user. Do not decide silently. |
-
-If the user asks to skip questions for speed, still preserve unresolved choices as explicit assumptions and keep the first diagram lightweight.
+## 1-1 rule (exploded <-> layered)
+- Every node/edge in `## System diagram` appears in the layered view (Overview or a detail section).
+- Every node/edge in the layered view exists in `## System diagram`.
+- A detail section's in/out arrows match that box's arrows in the Overview.
+Keep `## System diagram` in plain Mermaid so trace-check can parse it.
 
 ## Workflow
+1. For existing code: inspect entry points, runtime boundaries, integrations, and persistence
+   before drawing. Identify language/framework, entry points, major directories, external
+   integrations, data stores; label anything unclear as unknown.
+2. Build the flat `## System diagram` FIRST — the complete graph.
+3. Derive `## Overview` by grouping the flat graph to <= 7-9 boxes; then one detail section per box.
+4. Add `## Flow:` only if a runtime sequence answers a real question.
+5. End with assumptions (future/incomplete systems) and open questions (uncertain boundaries,
+   ownership, data flow).
 
-1. Establish purpose, format, and rigor.
-2. For existing code, inspect entry points, runtime boundaries, integrations, and persistence before drawing. For a quick pass, inspect enough to identify language/framework, launch entry points, major directories, external integrations, and data stores; label anything else as unknown.
-3. Pick the smallest useful diagram set. Start with system context or container; add component, dynamic, or deployment only when it answers a real question.
-4. Draw the diagram using ASCII or plain Mermaid.
-5. Explain the diagram in 3-6 bullets: boundaries, responsibilities, key relationships, assumptions, and open questions.
-6. Stop before detailed design unless the user approves the diagram and asks to continue.
-
-## C4 Level Selection
-
-| Level | Use when | Avoid when |
-| --- | --- | --- |
-| System context | Identifying users, external systems, and scope | The scope is already obvious and local. |
-| Container | Showing deployable/runnable units, data stores, APIs, CLIs, queues | You only need code-level call flow. |
-| Component | Explaining internals of one container | The container has few meaningful internal parts. |
-| Code | Rarely, for critical classes/modules | A normal component diagram would be enough. |
-| Dynamic | Showing request, event, or workflow sequence | Static structure is the actual question. |
-| Deployment | Showing infrastructure, nodes, networks, runtime placement | Deployment is unknown or irrelevant. |
-
-For small systems, challenge requests for all four C4 levels and offer a smaller set. If the user still wants all four, produce them but mark low-value levels as lightweight sketches and explain why they may not be worth maintaining.
-
-## Output Rules
-
-- Mermaid diagrams must use plain `flowchart` or `sequenceDiagram` syntax for portability.
-- ASCII diagrams should favor readable boxes and arrows over decorative complexity.
-- Keep labels concrete: actor, system, container, component, database, queue, external service.
-- Do not mix levels accidentally: containers are runnable/deployable units; components live inside one container.
-- Always include assumptions when diagramming a future system or incomplete codebase.
-- Always include open questions when boundaries, ownership, data flow, or deployment are uncertain.
+## Output rules
+- Plain Mermaid `flowchart` / `graph` for structure; `sequenceDiagram` for `## Flow:`. No
+  C4-specific Mermaid syntax.
+- `## System diagram` MUST be Mermaid (trace-check parses it). Prose elsewhere may use ASCII,
+  but keep the graphs Mermaid.
+- Concrete labels: actor, system, component, database, queue, external service.
+- The System diagram is DELIBERATELY flat and complete — that is the machine view, not a
+  "mixed-level" mistake.
 
 ## Templates
+- `templates/diagram.md` (repo templates dir) — the document SHAPE. Fill it.
+- `templates.md` (this skill dir) — Mermaid SNIPPETS for individual graphs within sections.
+  These are building blocks, NOT output headings.
 
-Use `templates.md` in this skill directory for compact ASCII and Mermaid starting points.
-
-## Common Mistakes
-
+## Common mistakes
 | Mistake | Fix |
 | --- | --- |
-| Drawing all four C4 levels by default | Draw only levels that answer the current question. |
-| Jumping into detailed design immediately | Validate context/container boundaries first. |
-| Using C4-specific Mermaid syntax | Use plain Mermaid `flowchart` or `sequenceDiagram`. |
-| Treating modules as containers | Containers are runnable/deployable units; modules are usually components. |
-| Hiding uncertainty | State assumptions and open questions after the diagram. |
+| Renaming the sections (System Context, Container View, ...) | Use `## System diagram` and `## Overview` verbatim. |
+| No single flat graph | `## System diagram` must be one complete, flat graph. |
+| A sequence diagram used as the structure | Put it under `## Flow:`; it never replaces the System diagram. |
+| Layered view drifts from the flat graph | Keep 1-1; trace-check Check 2 catches drift. |
+| Hiding uncertainty | State assumptions and open questions at the end. |

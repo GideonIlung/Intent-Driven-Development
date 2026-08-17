@@ -10,7 +10,8 @@ TYPE="$(fm "$DOC" type)"; ID="$(fm "$DOC" id)"; TAG="$(fm "$DOC" tag)"
 case "$TYPE" in
   implementation) PREFIX="impl"; ROLLBACK="git revert <commit>   # undo, keep history";;
   investigation)  PREFIX="inv";  ROLLBACK="git checkout $TAG      # revisit that state (read-only)";;
-  *) die "type must be implementation|investigation (got: $TYPE)";;
+  review)         PREFIX="rev";  ROLLBACK="git checkout $TAG      # revisit that state (read-only)";;
+  *) die "type must be implementation|investigation|review (got: $TYPE)";;
 esac
 [ "$TAG" = "$PREFIX/$ID" ] || die "tag should be '$PREFIX/$ID' (got: $TAG)"
 git rev-parse -q --verify "refs/tags/$TAG" >/dev/null 2>&1 && die "tag exists: $TAG"

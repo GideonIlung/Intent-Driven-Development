@@ -6,7 +6,9 @@
 - Running example throughout: a terminal task manager (`toy-todo`).
 
 ## What you get
-- Two modes: **implementation** (build something) and **investigation** (analyse, read-only).
+- Three modes: **implementation** (build something), **investigation** (analyse one symptom,
+  read-only), and **review** (describe a whole unit of existing code, then run it in a
+  sandbox to check the description).
 - A living map of the system: `specs/` (behaviour) + `adr/` (decisions).
 - A loop that turns approved specs into code, gated by real tests.
 - A git tag on every finished piece of work — roll back by name.
@@ -32,6 +34,11 @@
 ## Modes
 - **Implementation** → `work/changes/<slug>/`. Full artifact chain. Ends in code + updated `specs/`.
 - **Investigation** → `work/investigations/<slug>/`. One read-only report. Never edits code.
+- **Review** → `work/reviews/<slug>/`. Full artifact chain over EXISTING code at a pinned
+  commit. Ends in a report + executed evidence. Never edits code.
+
+Which one: change = what *should* be true · investigation = why *one thing* is broken ·
+review = what *is* true across a unit.
 
 ## Commands
 
@@ -77,6 +84,32 @@
 - Refines an existing report; re-grills the gaps.
 - Read-only; one document; no cascade.
 
+### `/review-new <slug>`
+- Starts a review of existing code.
+- Grills the subject, pins the commit, agrees the boundary policy, scaffolds, stops.
+- toy-todo: `/review-new todo-storage` → entry point `src/todo/store.py:save`.
+
+### `/review-continue <slug> [artifact]`
+- Draws the next artifact: inventory → diagrams → functions → scenarios.
+- **inventory** — the import closure. Repo code gets expanded; third-party libraries stop at
+  the boundary and get their own diagram.
+- **diagrams** — one flat function-level `## System diagram` (edges labelled with what
+  flows) plus the grouped process view, and one `lib-<name>.md` per boundary library.
+- **functions** — every function: signature, what it does, takes in, gives back, side effects.
+- **scenarios** — Gherkin *claims* about what the code does, tagged `@claimed`.
+- Name an artifact to revise it; revising flags downstream docs stale, no auto-cascade.
+
+### `/review-sandbox <slug>`
+- trace-check gate → disposable copy at the pinned commit → one test per scenario → run.
+- Boundary libraries stubbed, network off, nothing written back.
+- Each scenario ends **confirmed** / **refuted** / **unproven**. Refutations are the findings.
+- Needs `AGENTS.md`'s **Sandbox** section filled, or it stops and asks.
+
+### `/review-finish <slug>`
+- Reconciles the description to what execution showed, writes `review.md`, tags `rev/<slug>`.
+- Never writes durable `specs/` — hands confirmed scenarios to `/baseline` and fixes to
+  `/change-new`.
+
 ### `/baseline [capability]`
 - One-time, for existing code. Seeds `specs/` + `adr/` from what the code already does.
 - Reads the real code; one capability per run.
@@ -104,14 +137,26 @@
 bash finalise.sh work/investigations/list-shows-duplicates/report.md
 ```
 
+## Flow — review (toy-todo)
+```
+/review-new todo-storage
+/review-continue todo-storage           # ×4: inventory, diagrams, functions, scenarios
+/trace-check todo-storage               # gate
+/review-sandbox todo-storage            # runs the claims; confirmed/refuted/unproven
+/review-finish todo-storage             # writes review.md, tags rev/
+```
+
 ## Rollback
 - `git tag -l 'impl/*'` — completed changes.
 - `git tag -l 'inv/*'` — investigations.
+- `git tag -l 'rev/*'` — reviews.
 - `git revert <commit>` — undo a change.
 - `git checkout <tag>` — inspect a past state.
 
 ## Rules
 - One artifact per `/change-*` run; one story per Ralph iteration.
 - Ralph never touches `specs/` or `adr/` — `/change-finish` owns that.
-- Investigations never edit code.
+- Investigations never edit code. Reviews never edit code either — they run a *copy*.
+- A review is pinned to one commit. Every artifact and every test reads that commit.
+- Review scenarios are claims, not contracts. Only the sandbox turns one into evidence.
 - Fill `AGENTS.md`'s verification gate before running Ralph, or it has nothing to check.
