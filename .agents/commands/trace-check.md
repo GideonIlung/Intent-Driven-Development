@@ -9,13 +9,21 @@ report-and-stop. Executes nothing.
 - **Check 2 — diagram vs diagram (1-1)**: the exploded `## System diagram` and the layered
   `## Overview` + detail sections are the same graph.
 
-**Input**: `/trace-check <slug> [check]` — `check` is `scenarios` | `diagrams` | `all`
-(default `all`). If no slug, list `work/changes/*/` and `work/reviews/*/` and ask.
+**Input**: `/trace-check <slug> [check] [--unit <name>]` — `check` is `scenarios` |
+`diagrams` | `all` (default `all`). If no slug, list `work/changes/*/` and `work/reviews/*/`
+and ask.
 
 **Locate inputs**
 - The diagram document (following `templates/diagram.md`): must contain `## System diagram`,
   `## Overview`, and one detail section per Overview box.
-- The Gherkin scenarios (delta-spec for a change, review scenarios for a review).
+  - change → `work/changes/<slug>/diagrams/`
+  - review → `work/reviews/<slug>/diagrams/system.md`
+- The Gherkin scenarios:
+  - change → `delta-spec/<capability>/spec.md`
+  - review → `scenarios/<capability>/spec.md`
+- `--unit lib-<name>` scopes both checks to one boundary-library diagram
+  (`work/reviews/<slug>/diagrams/lib-<name>.md`). A library diagram has no scenarios of its
+  own, so Check 1 is skipped and only Check 2 (1-1) runs. Say so in the output.
 - If a required input is missing, stop and say which. Diagrams must be Mermaid to parse.
 
 ---
@@ -68,11 +76,17 @@ Summary: Check 1 - <n> passed / <n> holes.  Check 2 - <n> issues.
 
 **What it does not do**: structural coherence only — not correctness, not runtime, not
 whether the diagram matches the real code. A lint, not a proof. Execution is Cucumber/Ralph
-after code; soundness is TLA+/Alloy.
+after code, or `/review-sandbox` for a review; soundness is TLA+/Alloy.
+
+**Mode note**: a change's scenarios are CONTRACTS (what will be built); a review's are
+CLAIMS (what the code appears to do). trace-check treats them identically — it checks the
+documents agree with each other, never that either matches reality. For a review, passing
+here means the description is coherent enough to be worth executing, nothing more.
 
 **Guardrails**
 - Read-only; prints to chat; writes no file.
-- Runs both checks by default; `scenarios` or `diagrams` scopes to one.
+- Runs both checks by default; `scenarios` or `diagrams` scopes to one; `--unit` scopes to
+  one boundary-library diagram (Check 2 only).
 - Needs Mermaid diagrams to parse nodes/edges; freeform art degrades to eyeballing — say so.
 - Over-report ambiguous cases rather than silently pass.
 - Never pick which side is wrong; report both fixes.

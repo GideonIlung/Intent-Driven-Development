@@ -19,6 +19,20 @@ no filler. Prefer a five-word bullet to a sentence.
 ## Verification gate — quality checks
 <!-- the exact commands that prove a change is correct in THIS project -->
 
+## Sandbox — review mode execution
+<!-- Read by /review-sandbox. Authoritative for THIS project. If empty, /review-sandbox
+     stops and asks rather than improvising an environment.
+     - Isolate:   how to make a throwaway copy + env at a pinned commit
+                  e.g. git worktree add --detach sandbox/tree <sha>
+                       python -m venv sandbox/env && sandbox/env/bin/pip install -r requirements.txt
+                  R:   renv::restore(project = "sandbox/tree")
+     - Run one:   the command that runs a single generated test
+                  e.g. sandbox/env/bin/pytest sandbox/tests/<id>.py -q
+                  R:   Rscript -e 'testthat::test_file("sandbox/tests/<id>.R")'
+     - Stub:      how third-party boundaries are faked (monkeypatch, mockery, DI)
+     - Never run: live DB, paid API, licensed solver, anything with a real credential.
+                  These become `unproven`, never guessed. -->
+
 ## Hard rules
 <!-- project-specific don'ts. Universal ones live in CONVENTIONS.md. -->
 
