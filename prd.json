@@ -37,7 +37,7 @@
       "id": "behaviour-verification",
       "title": "Behaviour verification",
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "acceptanceCriteria": []
     }
   ]
