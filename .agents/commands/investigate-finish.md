@@ -1,0 +1,10 @@
+---
+description: Close an investigation. Root-cause report, hand off as a hotfix.
+argument-hint: [slug]
+---
+finish investigate: $ARGUMENTS
+
+1. skill report. root cause need probe evidence. else mark unproven.
+2. scripts/idd handoff <slug> → seed /change-new <slug>-fix --hotfix with @X.
+3. scripts/idd render <slug> --archive.
+4. summary: cause, evidence, next command.

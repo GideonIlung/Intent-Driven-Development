@@ -1,0 +1,10 @@
+---
+description: Close a review. Optionally promote to specs as baseline.
+argument-hint: [slug]
+---
+finish review: $ARGUMENTS
+
+1. report.md done? Unconfirmed listed?
+2. ask human: promote to specs/<cap>/? yes → scripts/idd merge <slug> --baseline. CONFIRM scenario only.
+3. scripts/idd render <slug> --archive.
+4. summary: coverage, top finding, suggested change.

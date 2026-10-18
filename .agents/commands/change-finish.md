@@ -1,0 +1,11 @@
+---
+description: Close a change. Full gate, merge delta into specs, archive.
+argument-hint: [slug]
+---
+finish change: $ARGUMENTS
+
+1. scripts/idd gate <slug> --full. red → stop.
+2. scripts/idd conform <slug>. drift → show. human decide.
+3. scripts/idd merge <slug> → specs/<cap>/.
+4. scripts/idd render <slug> --archive → archive/<date>-<slug>/.
+5. summary: scenario add/change/remove, box touched, story count, time.

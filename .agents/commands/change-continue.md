@@ -1,0 +1,18 @@
+---
+description: Write the next artefact of a change (scenarios → nodes → pseudo).
+argument-hint: [slug]
+---
+continue change: $ARGUMENTS (empty → only open change)
+
+1. scripts/idd status <slug> → next artefact.
+2. load skill (scenarios / nodes / pseudo). read intent.md + slice only. not whole specs.
+3. write artefact as delta.
+4. scripts/idd trace-check <slug>. fix all error. repeat.
+5. scripts/idd render <slug>.
+6. stop. one artefact. tell human: check view.gen.html → /change-continue or /change-ship.
+
+flag:
+- --refactor: scenario delta empty.
+- --hotfix: skip nodes if no box change. max 2 box, 1 scenario.
+- --migrate: only store / file / external box change.
+- --remove: all REMOVED.

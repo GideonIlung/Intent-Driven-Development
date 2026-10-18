@@ -1,0 +1,4 @@
+*.gen.*
+.idd/
+work/**/probes/out/
+__pycache__/
