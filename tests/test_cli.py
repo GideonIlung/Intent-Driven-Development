@@ -1,4 +1,10 @@
 import unittest
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
 from unittest.mock import patch
 
 from todo import cli
@@ -34,6 +40,60 @@ class CommandTests(unittest.TestCase):
     def test_delete_parses_identifier(self, delete):
         self.assertEqual(cli.main(["delete", "12"]), 0)
         delete.assert_called_once_with(12)
+
+
+class StorageTests(unittest.TestCase):
+    def test_task_persists_across_command_runs(self):
+        with tempfile.TemporaryDirectory() as home:
+            environment = os.environ.copy()
+            environment["HOME"] = home
+            source = str(Path(__file__).parents[1] / "src")
+            environment["PYTHONPATH"] = source
+
+            added = subprocess.run(
+                [sys.executable, "-m", "todo", "add", "Buy milk"],
+                env=environment,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            listed = subprocess.run(
+                [sys.executable, "-m", "todo", "list"],
+                env=environment,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+            self.assertEqual(added.returncode, 0, added.stderr)
+            self.assertIn("1", added.stdout)
+            self.assertEqual(listed.returncode, 0, listed.stderr)
+            self.assertIn("Buy milk", listed.stdout)
+
+            saved = json.loads(
+                (Path(home) / ".todo" / "tasks.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(
+                saved,
+                {
+                    "tasks": [
+                        {"id": 1, "text": "Buy milk", "completed": False}
+                    ]
+                },
+            )
+
+    def test_malformed_data_is_reported_without_overwriting(self):
+        with tempfile.TemporaryDirectory() as home:
+            task_file = Path(home) / ".todo" / "tasks.json"
+            task_file.parent.mkdir()
+            malformed = "not json\n"
+            task_file.write_text(malformed, encoding="utf-8")
+
+            with patch.dict(os.environ, {"HOME": home}):
+                result = cli.main(["add", "Buy milk"])
+
+            self.assertEqual(result, 1)
+            self.assertEqual(task_file.read_text(encoding="utf-8"), malformed)
 
 
 if __name__ == "__main__":

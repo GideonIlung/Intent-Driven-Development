@@ -1,20 +1,24 @@
 """Command-line interface for the local task manager."""
 
 import argparse
+import sys
 from typing import Optional, Sequence
 
-from todo import tasks
+from todo import store, tasks
 
 
 def add(title: str) -> None:
-    tasks.add(title)
+    task = tasks.add(title)
+    print(f'{task["id"]}: {task["text"]}')
 
 
 def list_tasks(show_all: bool = False) -> None:
     if show_all:
-        tasks.list_all()
+        listed_tasks = tasks.list_all()
     else:
-        tasks.list_outstanding()
+        listed_tasks = tasks.list_outstanding()
+    for task in listed_tasks:
+        print(f'{task["id"]}: {task["text"]}')
 
 
 def complete(task_id: int) -> None:
@@ -59,7 +63,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = build_parser().parse_args(argv)
-    args.handler(args)
+    try:
+        args.handler(args)
+    except store.StorageError as error:
+        print(f"todo: {error}", file=sys.stderr)
+        return 1
     return 0
 
 

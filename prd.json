@@ -11,7 +11,7 @@
       "id": "local-task-storage",
       "title": "Local task storage",
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "acceptanceCriteria": [
         "Given the user added the task \"Buy milk\" in an earlier command run, when the user runs `todo list` in a new command run, then the output shows \"Buy milk\"."
       ]
