@@ -1,4 +1,0 @@
-python-command-foundation: added an installable Python CLI, all command parsers, operation stubs, and command-level tests; use setup.cfg for older setuptools compatibility.
-local-task-storage: persisted validated JSON tasks under ~/.todo and proved add/list across separate command runs; run tests with PYTHONPATH=src before installation.
-task-operations: added persistent list-all, complete, edit, and delete operations with completed markers and safe unknown-identifier errors.
-behaviour-verification: confirmed all 13 command, persistence, listing, mutation, and unknown-identifier tests pass; no project gate command is configured.
