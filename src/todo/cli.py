@@ -18,7 +18,8 @@ def list_tasks(show_all: bool = False) -> None:
     else:
         listed_tasks = tasks.list_outstanding()
     for task in listed_tasks:
-        print(f'{task["id"]}: {task["text"]}')
+        completed = " [completed]" if task["completed"] else ""
+        print(f'{task["id"]}: {task["text"]}{completed}')
 
 
 def complete(task_id: int) -> None:

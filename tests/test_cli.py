@@ -96,5 +96,94 @@ class StorageTests(unittest.TestCase):
             self.assertEqual(task_file.read_text(encoding="utf-8"), malformed)
 
 
+class TaskOperationTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary_home = tempfile.TemporaryDirectory()
+        self.home = self.temporary_home.name
+        self.environment = os.environ.copy()
+        self.environment["HOME"] = self.home
+        self.environment["PYTHONPATH"] = str(Path(__file__).parents[1] / "src")
+
+    def tearDown(self):
+        self.temporary_home.cleanup()
+
+    def run_todo(self, *arguments):
+        return subprocess.run(
+            [sys.executable, "-m", "todo", *arguments],
+            env=self.environment,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+    def saved_tasks(self):
+        task_file = Path(self.home) / ".todo" / "tasks.json"
+        return json.loads(task_file.read_text(encoding="utf-8"))["tasks"]
+
+    def test_list_filters_completed_tasks_unless_all_requested(self):
+        self.run_todo("add", "Buy milk")
+        self.run_todo("add", "Wash car")
+        self.run_todo("complete", "2")
+
+        outstanding = self.run_todo("list")
+        all_tasks = self.run_todo("list", "--all")
+
+        self.assertEqual(outstanding.returncode, 0, outstanding.stderr)
+        self.assertIn("Buy milk", outstanding.stdout)
+        self.assertNotIn("Wash car", outstanding.stdout)
+        self.assertEqual(all_tasks.returncode, 0, all_tasks.stderr)
+        self.assertIn("Buy milk", all_tasks.stdout)
+        self.assertIn("Wash car [completed]", all_tasks.stdout)
+
+    def test_complete_persists_and_hides_task(self):
+        self.run_todo("add", "Buy milk")
+
+        completed = self.run_todo("complete", "1")
+        listed = self.run_todo("list")
+
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertTrue(self.saved_tasks()[0]["completed"])
+        self.assertNotIn("Buy milk", listed.stdout)
+
+    def test_edit_persists_new_text(self):
+        self.run_todo("add", "Buy milk")
+
+        edited = self.run_todo("edit", "1", "Buy bread")
+
+        self.assertEqual(edited.returncode, 0, edited.stderr)
+        self.assertEqual(self.saved_tasks()[0]["text"], "Buy bread")
+
+    def test_delete_removes_task_from_all_lists(self):
+        self.run_todo("add", "Buy milk")
+
+        deleted = self.run_todo("delete", "1")
+        listed = self.run_todo("list", "--all")
+
+        self.assertEqual(deleted.returncode, 0, deleted.stderr)
+        self.assertEqual(self.saved_tasks(), [])
+        self.assertNotIn("Buy milk", listed.stdout)
+
+    def test_unknown_identifiers_are_reported_without_changes(self):
+        commands = [
+            ("complete", "2"),
+            ("edit", "2", "Buy bread"),
+            ("delete", "2"),
+        ]
+        for command in commands:
+            with self.subTest(command=command):
+                if not self.saved_task_file_exists():
+                    self.run_todo("add", "Buy milk")
+                before = self.saved_tasks()
+
+                result = self.run_todo(*command)
+
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("task 2 does not exist", result.stderr)
+                self.assertEqual(self.saved_tasks(), before)
+
+    def saved_task_file_exists(self):
+        return (Path(self.home) / ".todo" / "tasks.json").exists()
+
+
 if __name__ == "__main__":
     unittest.main()

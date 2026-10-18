@@ -1,12 +1,6 @@
 """Task operations."""
 
-from typing import NoReturn
-
 from todo import store
-
-
-def _not_implemented() -> NoReturn:
-    raise NotImplementedError("task operations are not implemented")
 
 
 def add(title: str) -> store.Task:
@@ -17,17 +11,17 @@ def list_outstanding():
     return store.read_outstanding()
 
 
-def list_all() -> NoReturn:
-    _not_implemented()
+def list_all():
+    return store.read_all()
 
 
-def complete(task_id: int) -> NoReturn:
-    _not_implemented()
+def complete(task_id: int) -> store.Task:
+    return store.mark_complete(task_id)
 
 
-def edit(task_id: int, title: str) -> NoReturn:
-    _not_implemented()
+def edit(task_id: int, title: str) -> store.Task:
+    return store.update_text(task_id, title)
 
 
-def delete(task_id: int) -> NoReturn:
-    _not_implemented()
+def delete(task_id: int) -> None:
+    store.remove(task_id)

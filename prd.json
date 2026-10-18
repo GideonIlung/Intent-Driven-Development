@@ -20,7 +20,7 @@
       "id": "task-operations",
       "title": "Task operations",
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "acceptanceCriteria": [
         "Given the user has no saved tasks, when the user runs `todo add \"Buy milk\"`, then a new outstanding task with the text \"Buy milk\" is saved and the command shows the task's identifier.",
         "Given an outstanding task \"Buy milk\" and a completed task \"Wash car\", when the user runs `todo list`, then the output shows \"Buy milk\" and does not show \"Wash car\".",

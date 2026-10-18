@@ -12,6 +12,10 @@ class StorageError(Exception):
     """Raised when saved task data cannot be used."""
 
 
+class TaskNotFoundError(StorageError):
+    """Raised when a task identifier does not exist."""
+
+
 def data_file() -> Path:
     return Path.home() / ".todo" / "tasks.json"
 
@@ -62,6 +66,40 @@ def create(title: str) -> Task:
 
 def read_outstanding() -> List[Task]:
     return [task for task in load() if not task["completed"]]
+
+
+def read_all() -> List[Task]:
+    return load()
+
+
+def mark_complete(task_id: int) -> Task:
+    saved_tasks = load()
+    task = _find(saved_tasks, task_id)
+    task["completed"] = True
+    save(saved_tasks)
+    return task
+
+
+def update_text(task_id: int, title: str) -> Task:
+    saved_tasks = load()
+    task = _find(saved_tasks, task_id)
+    task["text"] = title
+    save(saved_tasks)
+    return task
+
+
+def remove(task_id: int) -> None:
+    saved_tasks = load()
+    task = _find(saved_tasks, task_id)
+    saved_tasks.remove(task)
+    save(saved_tasks)
+
+
+def _find(saved_tasks: List[Task], task_id: int) -> Task:
+    for task in saved_tasks:
+        if task["id"] == task_id:
+            return task
+    raise TaskNotFoundError(f"task {task_id} does not exist")
 
 
 def _valid_task(task: object) -> bool:
