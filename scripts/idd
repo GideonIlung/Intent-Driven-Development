@@ -2,4 +2,4 @@
 # thin wrapper. all logic in idd/ python package.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
-exec uv run python -m idd "$@"
+exec uv run --project tools/idd python -m idd "$@"

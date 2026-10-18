@@ -1,0 +1,21 @@
+# IDD harness settings. Commands run from the repo root.
+
+[gate]
+story = 'python -m pytest -q -W ignore::pytest.PytestUnknownMarkWarning -m "{markers}"'   # {markers} = "A or B"
+skeleton = "python -m compileall -q {files}"   # S0: files compile
+full = "python -m pytest -q -W ignore::pytest.PytestUnknownMarkWarning"
+lint = ""                                       # e.g. "ruff check ."
+
+[limits]
+boxes = 9
+scenarios = 6
+proc_lines = 15
+hotfix_boxes = 2
+hotfix_scenarios = 1
+group = 3          # max scenarios per story
+
+[conform]
+strict = false     # true: code-vs-pseudo drift fails the story
+
+[fence]
+always = ["tests/steps/", "tests/conftest.py", "work/"]

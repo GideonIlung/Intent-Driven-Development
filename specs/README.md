@@ -4,9 +4,13 @@ The living map of what this system does. Kept current by the archive step of
 every implementation change. Investigations never write here.
 
 ## Context
-<!-- C4 context diagram (Mermaid) — added as capabilities are baselined/built -->
+```mermaid
+flowchart LR
+  U[User] -->|runs todo commands| CLI[Todo CLI]
+  CLI -->|reads and writes| STORE[Per-user task file<br/>~/.todo/tasks.json]
+```
 
 ## Capabilities
 | Capability | What it does | Spec | Diagram |
 |------------|--------------|------|---------|
-| _(none yet)_ | | | |
+| todo | Manages locally persisted plain-text tasks from the `todo` command. | [spec](todo/spec.md) | Context above |
