@@ -24,3 +24,4 @@ no filler. Prefer a five-word bullet to a sentence.
 
 ## Learnings
 <!-- accumulates as the loop and you discover gotchas. Starts empty. -->
+- Package root Python tools with `setup.cfg` for the system's older setuptools.

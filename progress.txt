@@ -1,0 +1,1 @@
+python-command-foundation: added an installable Python CLI, all command parsers, operation stubs, and command-level tests; use setup.cfg for older setuptools compatibility.
